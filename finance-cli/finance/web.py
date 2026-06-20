@@ -8,7 +8,7 @@ import streamlit as st
 from datetime import date
 from finance.database import (
     init_db, add_expense, list_expenses, stats_by_category,
-    delete_expense, get_all_categories, get_months_range,
+    daily_stats, delete_expense, get_all_categories, get_months_range,
 )
 from finance.models import Expense
 
@@ -114,6 +114,19 @@ def page_stats():
         st.dataframe(rows, use_container_width=True, hide_index=True)
     else:
         st.info("暂无统计数据")
+
+    # 按日期统计（仅当选中具体月份时显示）
+    if year and month:
+        days = daily_stats(year, month)
+        if days:
+            st.subheader("📅 按日期统计")
+            df_days = pd.DataFrame(days)
+            chart = alt.Chart(df_days).mark_bar().encode(
+                x=alt.X("date:N", title="日期", axis=alt.Axis(labelAngle=0)),
+                y=alt.Y("total:Q", title="金额", axis=alt.Axis(titleAngle=0)),
+                tooltip=["date", "total"],
+            ).properties(height=300)
+            st.altair_chart(chart, use_container_width=True)
 
 
 def page_delete():

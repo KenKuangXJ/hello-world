@@ -78,6 +78,18 @@ def stats_by_category(year: int | None = None, month: int | None = None) -> list
         return [dict(r) for r in conn.execute(query, params).fetchall()]
 
 
+def daily_stats(year: int, month: int) -> list[dict]:
+    query = """
+        SELECT date, SUM(amount) as total
+        FROM expenses
+        WHERE strftime('%Y', date) = ? AND strftime('%m', date) = ?
+        GROUP BY date
+        ORDER BY date ASC
+    """
+    with _connect() as conn:
+        return [dict(r) for r in conn.execute(query, (str(year), f"{month:02d}")).fetchall()]
+
+
 def delete_expense(expense_id: int) -> bool:
     with _connect() as conn:
         cur = conn.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
