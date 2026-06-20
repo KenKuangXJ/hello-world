@@ -2,6 +2,8 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+import altair as alt
+import pandas as pd
 import streamlit as st
 from datetime import date
 from finance.database import (
@@ -94,8 +96,13 @@ def page_stats():
     stats = stats_by_category(year=year, month=month)
     if stats:
         st.subheader("柱状图")
-        chart_data = {s["category"]: s["total"] for s in stats}
-        st.bar_chart(chart_data)
+        df = pd.DataFrame(stats)
+        chart = alt.Chart(df).mark_bar().encode(
+            x=alt.X("category:N", title="分类", axis=alt.Axis(labelAngle=0)),
+            y=alt.Y("total:Q", title="金额", axis=alt.Axis(titleAngle=0)),
+            tooltip=["category", "total"],
+        ).properties(height=400)
+        st.altair_chart(chart, use_container_width=True)
 
         st.subheader("统计表")
         rows = []
