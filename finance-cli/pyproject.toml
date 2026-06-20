@@ -1,0 +1,8 @@
+[project]
+name = "finance-cli"
+version = "1.0.0"
+description = "带 Web 界面的记账工具"
+requires-python = ">=3.10"
+dependencies = [
+    "streamlit>=1.30",
+]
